@@ -1,0 +1,37 @@
+#!/usr/bin/python3
+#coding: utf-8
+import time
+#import os
+
+pathf = "/sys/class/leds/white:flash/flash_strobe"
+pathf_b = "sys/class/leds/white:flash/brightness"
+
+def strobe_flash():
+    with open(pathf,'w') as f:
+        f.write("1")
+        f.close()
+
+def on_flash():
+    with open(pathf_b,'w') as f:
+        f.write("1")
+        f.close()
+
+def off_flash():
+    with open(pathf_b,'w') as f:
+        f.write("0")
+        f.close()
+
+def is_placed_on_screen():
+    #i don't know the path of that
+    pass
+
+def get_lum_value():
+    #that too
+    pass
+
+
+while (True):
+    
+    time.sleep(2)
+
+  
