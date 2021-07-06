@@ -1,7 +1,68 @@
 #!/bin/bash
-rush(){
-	vim $1
-	chmod +x $1
+
+echo "RushScript - Beta (v1.0.0)"
+
+sauvegarder(){
+	mkdir -p ~/.rush-script/saves/
+	mv $1 ~/.rush-script/saves/$1
+}
+
+installer(){
+	sudo cp $1 /usr/bin/$1
+	sudo chmod a+x /usr/bin/$1
+	sauvegarder $1
+}
+
+executer(){
+	chmod a+x $1
 	./$1
 }
-rush $1
+
+execinstall(){
+	sudo cp $1 /usr/bin/$1
+	sudo chmod a+x /usr/bin/$1
+	chmod a+x $1
+	./$1
+	sauvegarder $1
+}
+
+edition(){
+	vim $1
+	if [ -f $1 ]
+	then
+		echo "Que shouaitez vous faire du fichier $1 ?"
+		echo "Vous pouvez faire plusieurs choses."
+		echo "----------"
+		echo "s : sauvegarder(sauvegarde seulement sans changement de permission)"
+		echo "x : executer(change avec la permission a+x)"
+		echo "i : installer(/usr/bin et changement a+x sans execution)"
+		echo "z : installer et executer(/usr/bin et a+x avec execution)"
+		echo "----------"
+		echo "Note: Toute installation deplace egalement vers le repertoire '~/.rush-script/saves/' le programme," 
+		echo "      mais cela ne creer pas de liens symboliques"
+		read -p "Inserez une lettre pour votre choix: (s / x / i / z)" choice
+		case $choice in
+  			s) sauvegarder $1 ;;
+  			x) executer $1 ;;
+			i) installer $1 ;;
+  			z) execinstall $1 ;;
+  			*) echo "Choix incorrect: $choice" ;;
+		esac  
+	else
+		echo "Le fichier n'existe pas, vous avez certainement pas enregistrer ou changer le nom du fichier a la sauvegarde."
+		echo "Annulation de l'execution. Execution impossible."
+		exit -2
+	fi
+}
+
+verif_args_1(){
+	if [ -z "$1" ]
+	then
+		echo "Nom de fichier requis en argument, pas de nom de script inscrit, ne peut fonctionner !"
+		exit -1
+	else
+		edition $1	
+	fi
+}
+
+verif_args_1 $1
