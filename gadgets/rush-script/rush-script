@@ -1,6 +1,8 @@
 #!/bin/bash
 
-echo "RushScript - Beta (v1.0.0)"
+echo "RushScript - (v1.0.2)"
+echo "By Rick Sanchez"
+echo "------"
 
 sauvegarder(){
 	mkdir -p ~/.rush-script/saves/
@@ -27,7 +29,18 @@ execinstall(){
 }
 
 edition(){
-	vim $1
+
+	# choix de l'editeur
+	if [ -z	"$2" ]
+	then
+		echo "vim sera utiliser comme éditeur par defaut."
+		vim $1
+	else
+		$2 $1
+	fi	
+	
+	
+	# verification si le fichier existe après et poursuite des operations demander par un choix
 	if [ -f $1 ]
 	then
 		echo "Que shouaitez vous faire du fichier $1 ?"
@@ -37,15 +50,17 @@ edition(){
 		echo "x : executer(change avec la permission a+x)"
 		echo "i : installer(/usr/bin et changement a+x sans execution)"
 		echo "z : installer et executer(/usr/bin et a+x avec execution)"
+		echo "q : Quitter et ne rien faire de plus"
 		echo "----------"
 		echo "Note: Toute installation deplace egalement vers le repertoire '~/.rush-script/saves/' le programme," 
 		echo "      mais cela ne creer pas de liens symboliques"
-		read -p "Inserez une lettre pour votre choix: (s / x / i / z)" choice
+		read -p "Inserez une lettre pour votre choix: (s / x / i / z / q)" choice
 		case $choice in
   			s) sauvegarder $1 ;;
   			x) executer $1 ;;
 			i) installer $1 ;;
   			z) execinstall $1 ;;
+			q) exit 0 ;;
   			*) echo "Choix incorrect: $choice" ;;
 		esac  
 	else
@@ -55,14 +70,36 @@ edition(){
 	fi
 }
 
+usage(){
+	echo "USAGE: rush-script FILEPATH [EDITOR]"
+	echo "EXEMPLE: rush-script test.sh nano"
+}
+
 verif_args_1(){
-	if [ -z "$1" ]
-	then
+	if [ -z "$1" ] ; then
 		echo "Nom de fichier requis en argument, pas de nom de script inscrit, ne peut fonctionner !"
+		usage
 		exit -1
-	else
-		edition $1	
+	elif [ "$1" == "-h" ] ; then
+		usage
+		exit 0
+	fi
+
+	if [ $# -eq 1 ] ; then
+		edition $1
+	elif [ $# -eq 2 ] ; then
+		edition $1 $2
+	elif [ $# -gt 2 ] ; then 
+		echo "Trop d'argument !"
+		exit -3
 	fi
 }
 
-verif_args_1 $1
+if [ $# -eq 0 ]
+then
+	echo "aucuns arguments !"
+	usage
+	exit -1
+else
+	verif_args_1 $1 $2
+fi
